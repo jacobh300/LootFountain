@@ -1,0 +1,41 @@
+name: LootFountain
+version: 1.0
+main: prime.lootfountain.LootFountain
+api-version: 1.16
+commands:
+  CreateFountain:
+    description: Creates a fountain
+    usage: /CreateFountain (FountainID) (DropEventFrequencyInSeconds) (DropEventDuration) (ItemDropFrequency)
+    default: op
+  ViewFountains:
+    description: Views current fountains
+    usage: /ViewFountains
+  AddFountainItem:
+    description: Add held item to a given fountain given a % chance.
+    usage: /AddFountainItem (FountainID) (%Chance)
+permissions:
+  lootfountain.*:
+    description: Gives access to all loot fountain commands
+    children:
+      lootfountain.view: true
+      lootfountain.create: true
+      lootfountain.delete: true
+      lootfountain.additem: true
+      lootfountain.deleteitem: true
+  lootfountain.view:
+    description: Allows access to view fountains
+    default: op
+  lootfountain.create:
+    description: Allows access to create a loot fountain
+    default: op
+  lootfountain.delete:
+    description: Allows access to delete a loot fountain
+    default: op
+  lootfountain.additem:
+    description: Allows access to add items to a loot fountain
+    default: op
+  lootfountain.deleteitem:
+    description: Allows access to delete items from a loot fountain
+    default: op
+
+
