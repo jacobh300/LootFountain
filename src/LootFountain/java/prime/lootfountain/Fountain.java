@@ -142,9 +142,13 @@ public class Fountain {
 
             ItemMeta newMetaData = item.getItemMeta();
             newMetaData.setLore( lore );
+
             item.setItemMeta( newMetaData );
 
-            fountainLocation.getWorld().dropItem(fountainLocation, item);
+            //Despawn item after 3 seconds (1 sec = 20 ticks)
+            Entity droppedItem = fountainLocation.getWorld().dropItem(fountainLocation, item);
+            droppedItem.setTicksLived( 6000 - (3 * 20)) ;
+            droppedItem.setVelocity( new Vector(0,1,0));
         }
 
     }
