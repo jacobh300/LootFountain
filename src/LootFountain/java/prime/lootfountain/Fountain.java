@@ -14,6 +14,7 @@ import org.bukkit.entity.Item;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import prime.lootfountain.utils.WeightedRandomBag;
@@ -128,13 +129,21 @@ public class Fountain {
     public void fountainDropItem(ItemStack item){
 
         if (fountainLocation != null && item.getType() != Material.AIR) {
+
             List<String> lore = item.getItemMeta().getLore();
+
             String percentLine = null;
             for (String string : lore) {
                 if (string.contains("%:")) percentLine = string;
             }
             if (percentLine != null) lore.remove(percentLine);
-            item.getItemMeta().setLore(lore);
+
+            if(plugin.debugMessages) plugin.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "Removing lore " + ChatColor.GRAY + lore + ChatColor.BLUE + percentLine);
+
+            ItemMeta newMetaData = item.getItemMeta();
+            newMetaData.setLore( lore );
+            item.setItemMeta( newMetaData );
+
             fountainLocation.getWorld().dropItem(fountainLocation, item);
         }
 
