@@ -2,6 +2,7 @@ package prime.lootfountain;
 
 
 import org.bukkit.ChatColor;
+import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.ArmorStand;
@@ -22,6 +23,7 @@ import prime.lootfountain.utils.WeightedRandomBag;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 public class Fountain {
@@ -84,6 +86,7 @@ public class Fountain {
     }
 
 
+    //Function for adding new name tags with armor stands.
     public void addNewTag(String tagText){
         Location location = fountainLocation.clone();
         location.setY( (location.getY() - tags.size() * 0.5) +2 );
@@ -128,6 +131,12 @@ public class Fountain {
     //Dropping item.
     public void fountainDropItem(ItemStack item){
 
+
+        float maxVelocity = 0.5f;
+        float minVelocity = -0.5f;
+        int despawnTimer = 6;
+        boolean gravity = false;
+
         if (fountainLocation != null && item.getType() != Material.AIR) {
 
             List<String> lore = item.getItemMeta().getLore();
@@ -138,8 +147,6 @@ public class Fountain {
             }
             if (percentLine != null) lore.remove(percentLine);
 
-            if(plugin.debugMessages) plugin.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "Removing lore " + ChatColor.GRAY + lore + ChatColor.BLUE + percentLine);
-
             ItemMeta newMetaData = item.getItemMeta();
             newMetaData.setLore( lore );
 
@@ -147,8 +154,20 @@ public class Fountain {
 
             //Despawn item after 3 seconds (1 sec = 20 ticks)
             Entity droppedItem = fountainLocation.getWorld().dropItem(fountainLocation, item);
-            droppedItem.setTicksLived( 6000 - (3 * 20)) ;
-            droppedItem.setVelocity( new Vector(0,1,0));
+            droppedItem.setTicksLived( 6000 - (despawnTimer * 20)) ;
+
+            droppedItem.setGlowing(true);
+            Random rand = new Random();
+
+
+            float x = rand.nextFloat() * (maxVelocity - (minVelocity)) + (minVelocity);
+            float z = rand.nextFloat() * (maxVelocity - (minVelocity)) + (minVelocity);
+            droppedItem.setVelocity( new Vector(x, 0.25, z));
+            droppedItem.setGravity(gravity);
+
+            droppedItem.setCustomName( item.getItemMeta().getDisplayName() );
+
+            droppedItem.setCustomNameVisible(true);
         }
 
     }
