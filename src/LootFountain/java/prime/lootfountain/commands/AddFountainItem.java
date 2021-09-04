@@ -93,6 +93,7 @@ public class AddFountainItem implements CommandExecutor {
                     }
 
                     currentLore.add("%:" + chanceForDrop);
+                    currentLore.add(ChatColor.RED + "RIGHT-CLICK to remove from loot table");
 
                     itemMeta.setLore(currentLore);
                     heldItem.setItemMeta(itemMeta);

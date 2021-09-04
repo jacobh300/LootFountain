@@ -1,17 +1,10 @@
 package prime.lootfountain;
 
 
-import org.bukkit.ChatColor;
-import org.bukkit.EntityEffect;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.entity.ArmorStand;
-
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
+import org.bukkit.*;
+import org.bukkit.entity.*;
 
 
-import org.bukkit.entity.Item;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
@@ -142,10 +135,14 @@ public class Fountain {
             List<String> lore = item.getItemMeta().getLore();
 
             String percentLine = null;
+            String removeLine = null;
             for (String string : lore) {
                 if (string.contains("%:")) percentLine = string;
+                else if (string.contains("RIGHT-CLICK to remove from loot table")) removeLine = string;
             }
+
             if (percentLine != null) lore.remove(percentLine);
+            if (removeLine != null ) lore.remove(removeLine);
 
             ItemMeta newMetaData = item.getItemMeta();
             newMetaData.setLore( lore );

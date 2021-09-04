@@ -67,7 +67,9 @@ public class ViewFountains  implements CommandExecutor {
                 stringList.add(ChatColor.YELLOW + "Drop event every " + frequency + " seconds");
                 stringList.add(ChatColor.YELLOW + "Event Duration " + dropEventDuration + " seconds" );
                 stringList.add(ChatColor.YELLOW + "Item drop every " + itemFrequency + " seconds" );
-
+                stringList.add("");
+                stringList.add(ChatColor.GREEN + "LEFT-CLICK to view loot table");
+                stringList.add(ChatColor.RED + "RIGHT-CLICK to delete fountain");
 
                 itemMeta.setLore(stringList);
                 item.setItemMeta(itemMeta);

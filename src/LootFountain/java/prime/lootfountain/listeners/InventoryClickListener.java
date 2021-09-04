@@ -9,13 +9,16 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import prime.lootfountain.Fountain;
 import prime.lootfountain.ItemSerializer;
 import prime.lootfountain.LootFountain;
 import prime.lootfountain.utils.Dictionary;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
+import java.util.List;
 
 public class InventoryClickListener implements Listener {
     private LootFountain plugin;
@@ -78,6 +81,7 @@ public class InventoryClickListener implements Listener {
                 String name = ChatColor.stripColor(item.getItemMeta().getDisplayName());
                 Inventory inventory = Bukkit.createInventory(null, 9 * 6, Dictionary.VIEW_FOUNTAININVENTORY_TITLE + name);
                 event.getWhoClicked().openInventory(inventory);
+
                 String base64LootTable =  plugin.getConfig().getString("ID." + name +".loottable");
 
                 try {
