@@ -18,7 +18,7 @@ public class FountainManager {
     public FountainManager(LootFountain plugin){
         this.plugin = plugin;
         if(plugin.debugMessages) plugin.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "Enabling things" );
-        fountainList = new ArrayList<Fountain>();
+        fountainList = new ArrayList<>();
         LoadFountainsFromConfigFunction(); //Get fountain list from config.
     }
 
@@ -29,7 +29,7 @@ public class FountainManager {
     private ArrayList<Fountain> LoadFountainsFromConfig(){
 
         if(plugin.getConfig().getConfigurationSection("ID") == null){
-            return new ArrayList<Fountain>();
+            return new ArrayList<>();
         }
 
         ArrayList<Fountain> newFountainList = new ArrayList<>();
@@ -105,6 +105,7 @@ public class FountainManager {
     public void removeFountainEntities(){
         for(Fountain fountain : fountainList){
             fountain.removeFountainNameTag();
+            fountain.stopFountain();
         }
     }
 

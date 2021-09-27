@@ -13,6 +13,18 @@ commands:
   AddFountainItem:
     description: Add held item to a given fountain given a % chance.
     usage: /AddFountainItem (FountainID) (%Chance)
+  ReloadFountains:
+    description: Reloads Loot Fountains.
+    usage: /ReloadFountains
+  FountainVerticalVelocity:
+    description: Edits the vertical velocity of a given fountain.
+    usage: /FountainVerticalVelcoity (FountaniID) (Value)
+  FountainHorizontalVelocity:
+    description: Edits the horizontal velocity of a given fountain. Value is used to find a random direction for the item drop. Values above 1-2 will result in high speeds.
+    usage: /FountainHorizontalVelocity (FountainID) (Value)
+  FountainToggleGravity:
+    description: Toggles if items dropped will be affected by gravity.
+    usage: /FountainToggleGravity (FountainID)
 permissions:
   lootfountain.*:
     description: Gives access to all loot fountain commands
@@ -36,6 +48,12 @@ permissions:
     default: op
   lootfountain.deleteitem:
     description: Allows access to delete items from a loot fountain
+    default: op
+  lootfountain.edit:
+    description: Allows to edit settings of fountains
+    default: op
+  lootfountain.reload:
+    description: Allows to reload fountains
     default: op
 
 

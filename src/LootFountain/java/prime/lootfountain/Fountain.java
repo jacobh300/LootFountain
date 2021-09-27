@@ -8,6 +8,7 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
@@ -32,6 +33,14 @@ public class Fountain {
 
     double dropEventDuration;
     double itemFrequency;
+
+    //Default Fountain Values
+    float horizontalVelocity = 0.5f;
+    float verticalVelocity = 1.25f;
+    int despawnTimer = 6;
+    boolean gravity = true;
+
+
 
     BukkitRunnable dropEvent;
     BukkitRunnable dropperTask;
@@ -59,10 +68,10 @@ public class Fountain {
         }
 
         //Replace Underscores with spaces
-        addNewTag(ChatColor.GOLD + fountainID.replace("_", " "));
-        addNewTag(ChatColor.YELLOW + "Drop event every " + (this.dropEventIntervalInSeconds) + " seconds");
-        addNewTag(ChatColor.YELLOW + "Event Duration " + this.dropEventDuration + " seconds" );
-        addNewTag(ChatColor.YELLOW + "Item drop every " + this.itemFrequency + " seconds" );
+        addNewTag(ChatColor.AQUA + "" + ChatColor.BOLD + fountainID.replace("_", " "));
+        addNewTag(ChatColor.GRAY + "Drop event every " + ChatColor.AQUA + (this.dropEventIntervalInSeconds) + ChatColor.GRAY + " seconds");
+        addNewTag(ChatColor.GRAY + "Event Duration " + ChatColor.AQUA + this.dropEventDuration + ChatColor.GRAY + " seconds" );
+        addNewTag(ChatColor.GRAY + "Item drop every " + ChatColor.AQUA + this.itemFrequency + ChatColor.GRAY + " seconds" );
     }
 
     public void startFountain(){
@@ -71,12 +80,44 @@ public class Fountain {
         dropEvent = new BukkitRunnable() {
             @Override
             public void run() {
-                if(!isDropping) startDropTask(fountainID, (long)itemFrequency, (long)dropEventDuration);
+
+                try{
+                   verticalVelocity = Float.parseFloat(  plugin.getConfig().getString("ID." + fountainID + ".verticalVelocity") );
+                }catch (Exception e){
+                    //Ignore if no vertical Velocity value in config.
+                }
+
+                try{
+                    horizontalVelocity = Float.parseFloat(  plugin.getConfig().getString("ID." + fountainID + ".horizontalVelocity") );
+                }catch (Exception e){
+                    //Ignore if no vertical Velocity value in config.
+                }
+
+                try{
+                    gravity = plugin.getConfig().getBoolean("ID." + fountainID + ".gravity"  );
+                }catch (Exception e){
+                    //Ignore if no vertical Velocity value in config.
+                }
+
+
+
+
+
+                if(!isDropping) startDropTask(fountainID, (long)itemFrequency, (long)dropEventDuration, horizontalVelocity, verticalVelocity, gravity);
             }
         };
 
         dropEvent.runTaskTimer(plugin, 20, (20L *  this.dropEventIntervalInSeconds) + (20L * (long)dropEventDuration));
     }
+
+
+    //For reloading fountains.
+    public void stopFountain(){
+        if(dropEvent != null) dropEvent.cancel();
+        if(dropperTask != null) dropperTask.cancel();
+        if(StopTask != null) StopTask.cancel();
+    }
+
 
 
     //Function for adding new name tags with armor stands.
@@ -124,18 +165,14 @@ public class Fountain {
     //Dropping item.
     public void fountainDropItem(ItemStack item){
 
-
-        float maxVelocity = 0.5f;
-        float minVelocity = -0.5f;
-        int despawnTimer = 6;
-        boolean gravity = false;
-
         if (fountainLocation != null && item.getType() != Material.AIR) {
 
             List<String> lore = item.getItemMeta().getLore();
 
             String percentLine = null;
             String removeLine = null;
+
+
             for (String string : lore) {
                 if (string.contains("%:")) percentLine = string;
                 else if (string.contains("RIGHT-CLICK to remove from loot table")) removeLine = string;
@@ -148,18 +185,21 @@ public class Fountain {
             newMetaData.setLore( lore );
 
             item.setItemMeta( newMetaData );
-
             //Despawn item after 3 seconds (1 sec = 20 ticks)
             Entity droppedItem = fountainLocation.getWorld().dropItem(fountainLocation, item);
             droppedItem.setTicksLived( 6000 - (despawnTimer * 20)) ;
 
-            droppedItem.setGlowing(true);
+            Item drop = (Item)droppedItem;
+            drop.setPickupDelay(20 * 1);
+            drop.setGlowing(true);
+
             Random rand = new Random();
 
 
-            float x = rand.nextFloat() * (maxVelocity - (minVelocity)) + (minVelocity);
-            float z = rand.nextFloat() * (maxVelocity - (minVelocity)) + (minVelocity);
-            droppedItem.setVelocity( new Vector(x, 0.25, z));
+
+            float x = rand.nextFloat() * (horizontalVelocity - (horizontalVelocity * -1)) + (horizontalVelocity * -1);
+            float z = rand.nextFloat() * (horizontalVelocity - (horizontalVelocity * -1)) + (horizontalVelocity * -1);
+            droppedItem.setVelocity( new Vector(x, verticalVelocity, z));
             droppedItem.setGravity(gravity);
 
             droppedItem.setCustomName( item.getItemMeta().getDisplayName() );
@@ -170,7 +210,7 @@ public class Fountain {
     }
 
 
-    public void startDropTask(String fountainID, long dropFrequencyInSeconds, long dropLengthInSeconds){
+    public void startDropTask(String fountainID, long dropFrequencyInSeconds, long dropLengthInSeconds, float horizontalVelocity, float verticalVelocity, boolean gravity){
         if(plugin.debugMessages) plugin.getServer().getConsoleSender().sendMessage(ChatColor.YELLOW + "Starting drop task for fountain: " + ChatColor.BLUE + fountainID);
 
         //Cancel any previous tasks of the fountain.
@@ -186,11 +226,16 @@ public class Fountain {
                 ItemStack[] lootTable = GetLootItemStackFromConfig(fountainID);
                 ItemStack item = null;
 
-                if (lootTable != null) {
-                    item = GetWeightedRandomItem(lootTable);
-                }
+                if (lootTable != null) item = GetWeightedRandomItem(lootTable);
 
-                if (item != null) {
+
+                if (item != null && item.getType() != Material.AIR) {
+
+                    float itemDropChance = GetLootItemDropChance(item);
+                    if( itemDropChance < 10){
+                        playSpecialItemEffect();
+                    }
+
                     fountainDropItem(item);
                 }
             }
@@ -211,12 +256,31 @@ public class Fountain {
         StopTask.runTaskTimer(plugin, 20 * dropLengthInSeconds, 0); //Triggers after 5 seconds and stops itself as well as the fountain dropping.
     }
 
+
+    public void playSpecialItemEffect(){
+
+        Location loc = fountainLocation.clone();
+        Firework firework = fountainLocation.getWorld().spawn(  loc.add(0,2,0),Firework.class);
+        FireworkMeta data = firework.getFireworkMeta();
+        FireworkEffect effect =  FireworkEffect.builder().withColor(Color.BLUE).with(FireworkEffect.Type.BURST).trail(false).build();
+
+        data.addEffect(effect);
+        data.setPower(1);
+
+
+        firework.setFireworkMeta(data);
+        firework.detonate();
+
+    }
+
+
     public ItemStack GetWeightedRandomItem(ItemStack[] items){
         WeightedRandomBag<ItemStack> itemDrops = new WeightedRandomBag<>();
         itemDrops.addEntry( new ItemStack(Material.AIR) , 50);
 
         for(ItemStack item : items) {
             if(item != null) itemDrops.addEntry(item, GetLootItemDropChance(item));
+
         }
         return itemDrops.getRandom();
     }

@@ -34,7 +34,7 @@ public class AddFountainItem implements CommandExecutor {
         if(sender.hasPermission("lootfountain.additem")) {
             if (args.length < 2) {
                 Player player = (Player)sender;
-                player.sendMessage(ChatColor.RED + "Fountain Creation Unsuccessful! " + ChatColor.YELLOW + "Use proper usage: " + command.getUsage() );
+                player.sendMessage(ChatColor.RED + "Fountain Creation Unsuccessful! Use proper usage: " + ChatColor.YELLOW + command.getUsage() );
                 return true;
             }
             AddItem(args[0], args[1], sender, command);

@@ -46,6 +46,11 @@ public class ViewFountains  implements CommandExecutor {
             Inventory inventory = Bukkit.createInventory(null, 9*6, Dictionary.VIEW_FOUNTAINLIST_TITLE);
             ConfigurationSection configurationSection = lootFountain.getConfig().getConfigurationSection("ID");
 
+            if(configurationSection == null){
+                player.sendMessage(ChatColor.RED + "No fountains created" );
+                return;
+            }
+
             for(String fountainName : configurationSection.getKeys(false)){
 
                 ItemStack item = new ItemStack(Material.CHEST);
@@ -75,9 +80,9 @@ public class ViewFountains  implements CommandExecutor {
                 item.setItemMeta(itemMeta);
 
                 inventory.addItem(item);
-                player.openInventory(inventory);
             }
 
+            player.openInventory(inventory);
         }
     }
 

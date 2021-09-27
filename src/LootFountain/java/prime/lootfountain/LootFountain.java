@@ -24,6 +24,15 @@ public final class LootFountain extends JavaPlugin {
         Objects.requireNonNull(getCommand("ViewFountains")).setExecutor(new ViewFountains(this));
         Objects.requireNonNull(getCommand("CreateFountain")).setExecutor( new CreateFountain(this));
 
+
+        Objects.requireNonNull(getCommand("FountainVerticalVelocity")).setExecutor( new FountainVerticalVelocity(this));
+        Objects.requireNonNull(getCommand("FountainHorizontalVelocity")).setExecutor( new FountainHorizontalVelocity(this));
+        Objects.requireNonNull(getCommand("FountainToggleGravity")).setExecutor( new FountainToggleGravity(this));
+
+
+
+        Objects.requireNonNull(getCommand("ReloadFountains")).setExecutor( new ReloadFountains(this));
+
         InventoryClickListener inventoryClickListener = new InventoryClickListener(this);
         DamageEventListener damageEventListener = new DamageEventListener(this);
 
